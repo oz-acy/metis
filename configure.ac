@@ -1,7 +1,7 @@
 dnl ====================================================================
 dnl   configure.in for METIS
 dnl ====================================================================
-AC_PREREQ(2.61)
+AC_PREREQ([2.69])
 AC_INIT(metis, 0.1.2, [acy@hiemalis.org])
 AC_CONFIG_SRCDIR([cattr.cpp])
 AC_CONFIG_HEADER([config.h])
