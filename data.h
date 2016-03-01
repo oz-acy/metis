@@ -4,7 +4,8 @@
  *  by oZ/acy
  *  (c) 2005-2011 oZ/acy.  ALL RIGHTS RESERVED.
  *
- *  last update: 7 Nov MMXI
+ *  履歴
+ *    2016.3.1 修正
  *
  *  Metisデータクラス
  *************************************************************************/
@@ -76,19 +77,20 @@ public:
 
 
 
-/*--------------------------------------
-*  class StringPiece
-*  文字列データ斷片
-*
-*  v0.2.0で追加
-*-------------------------------------*/
+/*----------------------------------------------------------
+ *  class StringPiece
+ *  文字列データ斷片
+ *
+ *  v0.2.0で追加
+ *  2016.3.1 修正 デストラクタにvirtualを付ける
+ */
 class StringPiece
 {
 protected:
   StringPiece() = default; // インスタンス化防止
 
 public:
-  ~StringPiece() {}
+  virtual ~StringPiece() {}
   virtual void accept(DatumVisitor&) =0;
   virtual StringPiece* clone() const =0;
 };
