@@ -9,6 +9,7 @@ find_package(FLEX)
 find_package(BISON)
 
 SET(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O3")
+#SET(CMAKE_CXX_FLAGS "-Wall -std=c++17 -O3")
 
 FLEX_TARGET(MyScanner lex.ll lex.cc)
 BISON_TARGET(MyParser parse.yy parse.cc)
