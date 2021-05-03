@@ -4,10 +4,12 @@
 **************************************************************************/
 
 #include <iostream>
-#include <string>
+#include <fstream>
 #include <sstream>
+#include <string>
 #include "data.h"
 #include "parser.h"
+#include "lexer.h"
 //#include "metis2xml.h"
 
 
@@ -17,7 +19,7 @@ public:
 
   void visit(metis::StringData& sdat)
     {
-      std::cout << "DUMP String Data {" << sdat.refer() << "}" << std::endl;
+      std::cout << "DUMP String Data {" << sdat.getText() << "}" << std::endl;
     }
 
   void visit(metis::Element& selm)
@@ -33,7 +35,9 @@ public:
   void visit(metis::Attribute& attr)
     {
       std::cout << "Attribute " << attr.name();
-      std::cout << " = {" << attr.content() << "}" << std::endl;
+      std::cout << " = {";
+      attr.content()->accept(*this);
+      std::cout << "}" << std::endl;
     }
 };
 
@@ -50,12 +54,33 @@ int main(int argc, char** argv)
   }
 
   string inpath = argv[1];
+  std::ifstream ifs(inpath);
+  if (ifs) {
+    metis::Lexer lexer;
+    lexer.switch_streams(&ifs, &std::cout);
 
-  metis::Element* root = metis::Parser::parse(inpath);
+    std::unique_ptr<metis::Element> root;
+    metis::Parser parser(lexer, root);
 
-  metis::WriteVisitor2Xml wv2x(cout);
-  root->accept(wv2x);
-  delete root;
+    if (parser.parse() == 0) {
+      std::cout << "成功!" << std::endl;
+      DumpVisitor dv;
+      root->accept(dv);
+    }
+    else {
+      std::cout << "失敗orz" << std::endl;
+    }
+  }
+
+
+
+  //metis::Element* root = metis::Parser::parse(inpath);
+
+  //metis::WriteVisitor2Xml wv2x(cout);
+  //root->accept(wv2x);
+  //DumpVisitor dv;
+  //root->accept(dv);
+  //delete root;
 
   return 0;
 }

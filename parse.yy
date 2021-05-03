@@ -1,48 +1,123 @@
-%{
-/*****************************************************************************
-*
-*  parse.yy
-*  by oZ/acy
-*  (c) 2005-2011 oZ/acy.  ALL RIGHTS RESERVED.
-*
-*  Metis 記述の構文解析器
-*
-*  update: 5 Oct MMXI
-*****************************************************************************/
+/*
+ * Copyright 2005-2021 oZ/acy (名賀月晃嗣)
+ * Redistribution and use in source and binary forms, 
+ *     with or without modification, 
+ *   are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+/*
+ * @file parse.yy
+ * @author oZ/acy
+ *
+ */
 
+%skeleton "lalr1.cc"
+%require "3.0"
+
+%defines
+%define api.parser.class {Parser}
+
+/* 構文解析器の屬性及び構築子引數の追加(らしい) */
+%parse-param { metis::Lexer& lexer } { std::unique_ptr<metis::Element>& rootE }
+
+/* 字句解析器を呼び出すときの追加パラメタ(らしい) */
+%lex-param { metis::Lexer& lexer }
+
+%code requires
+{
 #include <string>
 #include <iostream>
-#include <cstdlib>
-#include <cstdio>
-#include "parser.h"
+#include "data.h"
 
+//#include <cstdlib>
+//#include <cstdio>
 
-namespace {
-
-metis::Element* rootElement_SG;
-metis::Element* current_SG;
-
-inline std::string createString_SF(char* dupstr)
-{
-  using namespace std;
-  string ret(dupstr);
-  free(dupstr);
-  return ret;
+namespace metis { class Lexer; }
 }
 
 
-}//end of namespace
+%code
+{
+int
+yylex(
+  metis::Parser::semantic_type* yylval,
+  metis::Parser::location_type* location,
+  metis::Lexer& lexer);
+}
 
-extern int linenum_G;
+
+/*#include "parser.h"*/
+
+%locations
+%define api.namespace{metis}
+%define parse.error verbose
+%define api.value.type variant
+
+
+/* 終端記號 */
+%token <std::string> ID "identifier"
+%token <std::string> CHARREF "character reference"
+%token <std::string> STRDATA "string data"
+
+/* 非終端記號 */
+%type<std::unique_ptr<metis::Element>> element struct_element
+%type<std::unique_ptr<metis::Element>> empty_element element_head
+%type<std::list<std::unique_ptr<metis::Datum>>> data_list attributes attr_list
+%type<std::unique_ptr<metis::Attribute>> attribute
+%type<std::unique_ptr<metis::StringData>> string
+
+/*
+%type<dlist> data_list attributes attr_list
+%type<attr> attribute
+%type<str> string
+*/
+
+
+//namespace {
+
+//metis::Element* rootElement_SG;
+//metis::Element* current_SG;
+
+//inline std::string createString_SF(char* dupstr)
+//{
+//  using namespace std;
+//  string ret(dupstr);
+//  free(dupstr);
+//  return ret;
+//}
+
+
+//}//end of namespace
+
+//extern int linenum_G;
 
 // プロトタイプ宣言 (yylex, yyerror) for C++
-int yylex(void);
-int yyerror(char*);
+//int yylex(void);
+//int yyerror(char*);
 
 
-%}
+//%}
 
-
+/*
 %union {
   char* text;
   metis::Element* elm;
@@ -50,74 +125,69 @@ int yyerror(char*);
   std::list<metis::Datum*>* dlist;
   metis::StringData* str;
 }
+*/
 
 
 
+//%token <text> S_IDENT S_STRDATA S_CHARREF
+//%token S_AT S_LBRACE S_RBRACE S_LBRACKET S_RBRACKET
+//%token S_COMMA
+//%token S_AND S_SEMICOLON S_COLON S_EQU
 
-%token <text> S_IDENT S_STRDATA S_CHARREF
-%token S_AT S_LBRACE S_RBRACE S_LBRACKET S_RBRACKET
-%token S_COMMA
-%token S_AND S_SEMICOLON S_COLON S_EQU
+//%type<elm> element struct_element empty_element element_head
+//%type<dlist> data_list attributes attr_list
+//%type<attr> attribute
+//%type<str> string
 
-
-
-%type<elm> element struct_element empty_element element_head
-%type<dlist> data_list attributes attr_list
-%type<attr> attribute
-%type<str> string
-
-%start top_level
+//%start top_level
 
 %%
-
-
 top_level
 : element
 {
-  rootElement_SG = $1;
+  rootE = std::move($1);
+  //rootElement_SG = $1;  //or rootElement = std::move($1);
 }
 ;
 
 element
 : struct_element
 {
-  $$ = $1;
+  $$ = std::move($1);
 }
 | empty_element
 {
-  $$ = $1;
+  $$ = std::move($1);
 }
 ;
 
-
 element_head
-: S_AT S_IDENT
+: '@' ID
 {
-  $$ = new metis::Element($2, current_SG);
-  current_SG = $$;
-  std::free($2);
+  $$ = std::make_unique<metis::Element>($2);
 }
 ;
 
 empty_element
-: element_head attributes S_SEMICOLON
+: element_head attributes ';'
 {
-  $$ = $1;
-  $$->children() = *$2;
-  delete $2;
-  current_SG = $$->parent();
+  $$ = std::move($1);
+  $$->children() = std::move($2);
 }
 ;
 
 struct_element
-: element_head attributes S_LBRACE data_list S_RBRACE
+: element_head attributes '{' data_list '}'
 {
-  $$ = $1;
-  $$->children() = *$2;
-  $$->children().splice($$->children().end(), *$4);
-  delete $4;
-  delete $2;
-  current_SG = $$->parent();
+  $$ = std::move($1);
+  $$->children() = std::move($2);
+  $$->children().splice($$->children().end(), $4);
+
+  //$$->children() = *$2;
+  //$$->children().splice($$->children().end(), *$4);
+  //delete $4;
+  //delete $2;
+  //current_SG = $$->parent();
 }
 ;
 
@@ -125,17 +195,17 @@ struct_element
 data_list
 :
 {
-  $$ = new std::list<metis::Datum*>;
+  $$ = std::list<std::unique_ptr<metis::Datum>>();
 }
 | data_list element
 {
-  $$ = $1;
-  $$->push_back($2);
+  $$ = std::move($1);
+  $$.push_back(std::move($2));
 }
 | data_list string
 {
-  $$ = $1;
-  $$->push_back($2);
+  $$ = std::move($1);
+  $$.push_back(std::move($2));
 }
 ;
 
@@ -143,59 +213,54 @@ data_list
 attributes
 :
 {
-  $$ = new std::list<metis::Datum*>;
+  $$ = std::list<std::unique_ptr<metis::Datum>>();
 }
-| S_LBRACKET attr_list S_RBRACKET
+| '[' attr_list ']'
 {
-  $$ = $2;
+  $$ = std::move($2);
 }
 
 attr_list
 : attribute
 {
-  $$ = new std::list<metis::Datum*>;
-  $$->push_back($1);
+  $$ = std::list<std::unique_ptr<metis::Datum>>();
+  $$.push_back(std::move($1));
 }
-| attr_list S_COMMA attribute
+| attr_list ',' attribute
 {
-  $$ = $1;
-  $$->push_back($3);
+  $$ = std::move($1);
+  $$.push_back(std::move($3));
 }
 ;
 
 
 attribute
-: S_IDENT S_LBRACE string S_RBRACE
+: ID '{' string '}'
 {
-  $$ = new metis::Attribute($1, $3, current_SG);
-  std::free($1);
+  $$ = std::make_unique<metis::Attribute>($1, std::move($3));
 }
 
 
 string
-: S_STRDATA
+: STRDATA
 {
-  $$ = new metis::StringData(current_SG);
-  $$->push_back(new metis::NormalString($1));
-  std::free($1);
+  $$ = std::make_unique<metis::StringData>();
+  $$->push_back(std::make_unique<metis::NormalString>($1));
 }
-| S_CHARREF
+| CHARREF
 {
-  $$ = new metis::StringData(current_SG);
-  $$->push_back(new metis::CharReference($1));
-  std::free($1);
+  $$ = std::make_unique<metis::StringData>();
+  $$->push_back(std::make_unique<metis::CharReference>($1));
 }
-| string S_STRDATA
+| string STRDATA
 {
-  $$ = $1;
-  $$->push_back(new metis::NormalString($2));
-  std::free($2);
+  $$ = std::move($1);
+  $$->push_back(std::make_unique<metis::NormalString>($2));
 }
-| string S_CHARREF
+| string CHARREF
 {
-  $$ = $1;
-  $$->push_back(new metis::CharReference($2));
-  std::free($2);
+  $$ = std::move($1);
+  $$->push_back(std::make_unique<metis::CharReference>($2));
 }
 ;
 
@@ -203,7 +268,19 @@ string
 
 
 %%
+void metis::Parser::error(const location_type& l, const std::string& m)
+{
+  std::cerr
+    << "error at "
+    << (int)l.begin.line << ':' << (int)l.begin.column << " - "
+    << (int)l.end.line << ':' << (int)l.end.column << std::endl;
+}
 
+
+
+
+//// 以下OLD ////////
+/*
 void initLexer(FILE*);
 
 metis::Element* metis::Parser::parse(const std::string& path)
@@ -221,7 +298,7 @@ metis::Element* metis::Parser::parse(const std::string& path)
   fclose(fp);
   return rootElement_SG;
 }
-
+*/
 
 
 /* eof */
