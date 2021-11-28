@@ -66,7 +66,6 @@ public:
 };
 
 
-
 }// end of namespace
 
 
@@ -77,14 +76,8 @@ public:
 std::list<metis::Element*> metis::Element::getChildElements() const
 {
   ElmListUpVisitor_ ev;
-
   for (auto& upd : data_)
     upd->accept(ev);
-
-  //const_iterator it;
-  //for (it = data_.begin(); it != data_.end(); ++it)
-  //  (*it)->accept(ev);
-
   return ev.get();
 }
 
@@ -93,14 +86,8 @@ std::list<metis::Element*>
 metis::Element::getChildElements(const std::string& name) const
 {
   ElmListUpByNameVisitor_ ev(name);
-  
   for (auto& upd: data_)
     upd->accept(ev);
-
-  //const_iterator it;
-  //for (it = data_.begin(); it != data_.end(); ++it)
-  //  (*it)->accept(ev);
-
   return ev.get();
 }
 

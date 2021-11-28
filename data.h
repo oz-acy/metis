@@ -186,13 +186,7 @@ private:
 protected:
   std::unique_ptr<Datum> clone_() const override;
 
-  //std::unique_ptr<Datum> clone_(Element* e) const override;
-
-  //StringData* clone_(Element* e) const;
-
 public:
-  //StringData(Element* e =nullptr) : Datum(e) {}
-
   std::unique_ptr<StringData> clone() const
   {
     return
@@ -239,7 +233,6 @@ private:
 
 public:
   explicit HasName(const std::string& n) : name_(n) {}
-  //HasName(const std::string& s, Element* p) : Datum(p), name_(s) {}
   const std::string& name() const noexcept { return name_; }
 
   std::unique_ptr<HasName> clone() const
@@ -268,16 +261,9 @@ protected:
   std::unique_ptr<Datum> clone_() const override
     { return  std::unique_ptr<Datum>(new Attribute(name(), str_->clone())); }
 
-  //std::unique_ptr<Datum> clone_(Element* e) const override
-  //  { return new Attribute(name(), str_->clone(), e); }
-
-  //Attribute* clone_(Element* e) const
-  //  { return new Attribute(name(), str_->clone(), e); }
-
 public:
   Attribute(const std::string& na, std::unique_ptr<StringData>&& s)
-    //const std::string& na, std::unique_ptr<StringData>&& s, Element* e)
-    : HasName(na/*, e*/), str_(std::move(s))
+    : HasName(na), str_(std::move(s))
     {}
 
   std::unique_ptr<Attribute> clone() const
@@ -306,22 +292,14 @@ public:
   using iterator = std::list<std::unique_ptr<Datum>>::iterator;
   using const_iterator = std::list<std::unique_ptr<Datum>>::const_iterator;
 
-  //typedef std::list<Datum*>::iterator iterator;
-  //typedef std::list<Datum*>::const_iterator const_iterator;
-
 private:
   std::list<std::unique_ptr<Datum>> data_;
-  //std::list<Datum*> data_;
 
 protected:
   std::unique_ptr<Datum> clone_() const override;
-  //std::unique_ptr<Datum> clone_(Element* p) const override;
-
-  //Element* clone_(Element* p) const;
 
 public:
   explicit Element(const std::string& n) : HasName(n) {}
-  //Element(const std::string& s, Element* p =nullptr) : HasName(s, p) {}
 
   std::unique_ptr<Element> clone() const
   {
@@ -338,11 +316,6 @@ public:
   std::list<std::unique_ptr<Datum>>::size_type countChildren() const
     { return data_.size(); }
   std::list<std::unique_ptr<Datum>>::size_type countAttribute() const;
-
-  //std::list<Datum*>& children() { return data_; }
-  //const std::list<Datum*>& children() const { return data_; }
-  //std::list<Datum*>::size_type countChildren() const { return data_.size(); }
-  //std::list<Datum*>::size_type countAttribute() const;
 
   bool empty() const { return countChildren() == countAttribute(); }
 

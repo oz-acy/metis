@@ -129,12 +129,6 @@ std::string metis::StringData::getUtf8Code() const
     oss << uppercase << hex << setw(2) << setfill('0') << (c & 0x00ff);
   }
 
-  //string::iterator it;
-  //for (it = ts.begin(); it != ts.end(); ++it)
-  //{
-  //  oss << uppercase << hex << setw(2) << setfill('0') << (*it & 0x00FF);
-  //}
-
   return oss.str();
 }
 
@@ -144,19 +138,9 @@ std::string metis::StringData::getUtf8Code() const
  */
 std::string metis::StringData::getText() const
 {
-  using namespace std;
-
   Visitor4Str2Cmp_ vsc;
-  //list<StringPiece*>::const_iterator it;
-
   for (auto& ups : strs_)
     ups->accept(vsc);
-
-  //for (it = strs_.begin(); it != strs_.end(); ++it)
-  //{
-  //  (*it)->accept(vsc);
-  //}
-
   return vsc.str();
 }
 

@@ -40,7 +40,8 @@ set(METIS_HEADERS
   data.h
   stringvisitor.h
   stringescape.h
-  ${CMAKE_CURRENT_BINARY_DIR}/parser.h
+  #lexer.h
+  #${CMAKE_CURRENT_BINARY_DIR}/parser.h
 )
 
 
@@ -48,6 +49,9 @@ set(METIS_HEADERS
 ADD_LIBRARY(metis STATIC ${METIS_SOURCES})
 target_compile_options(metis PRIVATE
   $<$<CXX_COMPILER_ID:GNU>:-Wall -O3>
+)
+set_target_properties(metis
+  PROPERTIES PUBLIC_HEADER "${METIS_HEADERS}"
 )
 target_compile_definitions(metis PRIVATE NDEBUG)
 target_include_directories(metis PRIVATE

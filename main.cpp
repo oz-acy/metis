@@ -1,7 +1,7 @@
-/**************************************************************************
-*  main.cpp
-*  by oZ/acy
-**************************************************************************/
+/*
+ *  @file main.cpp
+ *  @author oZ/acy
+ */
 
 #include <iostream>
 #include <fstream>
@@ -13,6 +13,7 @@
 //#include "metis2xml.h"
 
 
+// テストのためのダンプ出力を行ふVisitor
 class DumpVisitor : public metis::DatumVisitor
 {
 public:
@@ -71,16 +72,6 @@ int main(int argc, char** argv)
       std::cout << "失敗orz" << std::endl;
     }
   }
-
-
-
-  //metis::Element* root = metis::Parser::parse(inpath);
-
-  //metis::WriteVisitor2Xml wv2x(cout);
-  //root->accept(wv2x);
-  //DumpVisitor dv;
-  //root->accept(dv);
-  //delete root;
 
   return 0;
 }

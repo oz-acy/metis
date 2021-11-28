@@ -78,11 +78,6 @@ std::list<metis::Attribute*> metis::Element::getAttributes() const
   AttrListUpVisitor_ av;
   for (auto& upd : data_)
     upd->accept(av);
-
-  //const_iterator it;
-  //for (it = data_.begin(); it != data_.end(); ++it)
-  //  (*it)->accept(av);
-
   return av.get();
 }
 
@@ -101,12 +96,6 @@ metis::Attribute* metis::Element::getAttrByName(const std::string& name) const
   }
 
   return nullptr;
-
-  //const_iterator it;
-  //for (it = data_.begin(); it != data_.end() && !av.get(); ++it)
-  //  (*it)->accept(av);
-
-  //return av.get();
 }
 
 

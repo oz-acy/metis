@@ -24,7 +24,7 @@
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  */
-/*
+/**
  * @file lexer.h
  * @author oZ/acy
  *

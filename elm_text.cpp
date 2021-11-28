@@ -68,14 +68,8 @@ public:
 std::list<metis::StringData*> metis::Element::getTexts() const
 {
   StrListUpVisitor_ sv;
-
   for (auto& upd : data_)
     upd->accept(sv);
-
-  //const_iterator it;
-  //for (it = data_.begin(); it != data_.end(); ++it)
-  //  (*it)->accept(sv);
-
   return sv.get();
 }
 

@@ -25,7 +25,6 @@
  *
  */
 /**
- *
  * @file element.cpp
  * @author oZ/acy
  *
@@ -41,10 +40,6 @@ std::unique_ptr<metis::Datum> metis::Element::clone_() const
 
   for (auto& upd : data_)
     res->data_.push_back(upd->clone());
-
-  //const_iterator it;
-  //for (it = data_.begin(); it != data_.end(); ++it)
-  //  res->data_.push_back((*it)->clone_(res));
 
   return std::unique_ptr<Datum>(res);
 }
@@ -73,12 +68,8 @@ public:
 std::list<metis::Datum*>::size_type metis::Element::countAttribute() const
 {
   AttrCounter_ ac;
-
   for (auto& upd : data_)
     upd->accept(ac);
-  //const_iterator it;
-  //for (it = data_.begin(); it != data_.end(); ++it)
-  //  (*it)->accept(ac);
   return ac.count();
 }
 

@@ -1,21 +1,38 @@
-/**************************************************************************
-*
-*  charref.cpp
-*  by oZ/acy
-*  (c) 2008-2011 oZ/acy.  ALL RIGHTS RESERVED.
-*
-*  last update : 5 Oct MMXI
-*
-*  Metisクラス定義
-*  文字參照關係
-*
-**************************************************************************/
-
+/*
+ * Copyright 2008-2021 oZ/acy (名賀月晃嗣)
+ * Redistribution and use in source and binary forms, 
+ *     with or without modification, 
+ *   are permitted provided that the following conditions are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, 
+ * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+ * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR
+ * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
+ * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
+ * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF 
+ * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ */
+/**
+ * @file charref.cpp
+ * @author oZ/acy
+ *
+ * @brief 文字參照周りの處理
+ */
 #include <iostream>
-#include <map>
 #include <unordered_map>
 #include <sstream>
-//#include <boost/lexical_cast.hpp>
 #include "data.h"
 
 
@@ -255,18 +272,10 @@ metis::CharReference::CharReference(const std::string& c)
     }
   }
   else { // 別名表現の場合
-    //static std::map<std::string, std::string> cvttable;
     code_ = "FFFFFFFF";
     auto s = c.substr(0, l - 1);
     if (entityRefTable_.contains(s))
       code_ = entityRefTable_[s];
-
-    //if (cvttable.empty())
-    //  initCvtTable_S(cvttable);
-    //std::map<std::string, std::string>::iterator it;
-    //it = cvttable.find(c.substr(0, l - 1));
-    //if (it != cvttable.end())
-    //  code_ = it->second;
   }
 }
 
@@ -279,7 +288,6 @@ std::unique_ptr<metis::StringPiece> metis::CharReference::clone_() const
 }
 
 
-
 /*
  * @brief 文字コードを整數値で返却する。
  * @date 2008.2.15 create 
@@ -287,8 +295,6 @@ std::unique_ptr<metis::StringPiece> metis::CharReference::clone_() const
  */
 unsigned int metis::CharReference::codeval() const
 {
-  //return std::stoi(code_, nullptr, 16);
-
   unsigned t = 0;
   
   for (auto c : code_) {

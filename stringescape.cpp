@@ -62,7 +62,9 @@ StringConvertTable_::StringConvertTable_()
   table_['&'] = "&amp;";
 }
 
+
 StringConvertTable_ sctable_SG;
+
 
 }//end of NONAME namespace
 
@@ -73,21 +75,12 @@ StringConvertTable_ sctable_SG;
 *  operator<<()
 *  Metis 文字列エスケープクラス用出力演算子
 *---------------------------------------------------*/
-std::ostream& metis::operator<<(std::ostream& os, const metis::StringEscape& se)
+std::ostream&
+metis::operator<<(std::ostream& os, const metis::StringEscape& se)
 {
   for (auto c : se.str_)
     os << sctable_SG.get(c);
-
   return os;
-
-
-  //const std::string& tgt = se.str_;
-  //std::string::const_iterator pc;
-
-  //for (pc = tgt.begin(); pc != tgt.end(); ++pc)
-  //  os << sctable_SG.get(*pc);
-
-  //return os;
 }
 
 
